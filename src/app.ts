@@ -21,10 +21,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next(createError(500, 'Routes not found'));
 });
 
-app.use((err: any, req: Request, res: Response) => {
-  return res.status(err.status || 500).json({
+
+app.use((error: any, req: Request, res: Response) => {
+  return res.status(error.status || 500).json({
     success: false,
-    message: err.message,
+    message: error.message,
   });
 });
 
