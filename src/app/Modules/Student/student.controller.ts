@@ -1,42 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { studentServicer } from './student.services';
-import StudentValidationSchema from './student.validation';
+import { studentServicer } from './student.service';
 import createError from 'http-errors';
-
-const createStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
-    const student = req.body;
-    if (!student) {
-      throw createError(500, 'data not found');
-    }
-
-    // data validation with zod
-    const parseDataFromZodValidation = StudentValidationSchema.parse(student);
-    const result = await studentServicer.saveStudentInDB(
-      parseDataFromZodValidation,
-    );
-
-    if (result === undefined) {
-      throw createError(500, 'initial server error');
-    } else {
-      res.status(200).json({
-        success: true,
-        message: 'successfully created the user',
-        data: result,
-      });
-    }
-  } catch (error) {
-    let errorMessage = '';
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      next(errorMessage);
-    }
-  }
-};
+import sendResponse from '../../utils/sendResponse';
+import httpStatus from 'http-status';
 
 const getALlStudent = async (
   req: Request,
@@ -45,35 +11,61 @@ const getALlStudent = async (
 ) => {
   try {
     const result = await studentServicer.getALlStudentFromDB();
-    res.status(200).json({
+
+    sendResponse(res, {
+      status: httpStatus.OK,
       success: true,
-      message: 'successfully created the user',
+      message: 'successfully get all user',
       data: result,
-    });
+    })
+
   } catch (error) {
-    let errorMessage = 'Failed to do something exceptional';
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      next(errorMessage);
-    }
+    next(error);
   }
 };
-const getSingleStudent = async (req: Request, res: Response) => {
+const getSingleStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { studentId } = req.params;
     const result = await studentServicer.getSingleStudentFromDB(studentId);
-    res.status(200).json({
+    sendResponse(res, {
+      status: httpStatus.OK,
       success: true,
-      message: 'successfully created the user',
+      message: 'successfully get a user',
       data: result,
-    });
+    })
+
   } catch (error) {
-    console.log(error);
+    next(error);
+  }
+};
+const deleteUserFromDB = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { studentId } = req.params;
+    if (!studentId) {
+      throw createError(404, 'id not found');
+    }
+    await studentServicer.deleteStudentFromDB(studentId);
+    sendResponse(res, {
+      status: httpStatus.OK,
+      success: true,
+      message: 'successfully delete a user',
+      data: null,
+    })
+  } catch (error) {
+    next(error);
   }
 };
 
 export const studentController = {
-  createStudent,
   getALlStudent,
   getSingleStudent,
+  deleteUserFromDB,
 };

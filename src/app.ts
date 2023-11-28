@@ -1,15 +1,19 @@
-import express, { Application, NextFunction, Request, Response } from 'express';
-import createError from 'http-errors';
+import express, { Application, Request, Response } from 'express';
 const app: Application = express();
 import cors from 'cors';
-import { studentRoutes } from './app/Modules/Student/student.router';
+import globalErrorHandler from './app/middleware/globalErrorHandler';
+import notFound from './app/middleware/notFound';
+import router from './app/routes';
 
 // parser
 app.use(express.json());
 app.use(cors());
 
+
+
 // get all routers
-app.use('/api/v1/student', studentRoutes);
+app.use('/api/v1', router);
+
 
 app.get('/', (req: Request, res: Response) => {
   res.json({
@@ -17,16 +21,11 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  next(createError(500, 'Routes not found'));
-});
 
+// not found middleware
+app.use(notFound);
 
-app.use((error: any, req: Request, res: Response) => {
-  return res.status(error.status || 500).json({
-    success: false,
-    message: error.message,
-  });
-});
+// global error handling middleware
+app.use(globalErrorHandler);
 
 export default app;

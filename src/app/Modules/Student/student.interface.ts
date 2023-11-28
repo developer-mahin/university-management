@@ -1,52 +1,55 @@
-import { Model } from "mongoose";
+import { Model, Types } from 'mongoose';
 
-export type TName = {
+export type TUserName = {
   firstName: string;
-  middleName?: string;
+  middleName: string;
   lastName: string;
 };
 
 export type TGuardian = {
-  fathersName: string;
-  fathersOccupation: string;
-  fathersContactNumber: string;
-  mothersName: string;
-  mothersOccupation: string;
-  mothersContactNumber: string;
+  fatherName: string;
+  fatherOccupation: string;
+  fatherContactNo: string;
+  motherName: string;
+  motherOccupation: string;
+  motherContactNo: string;
 };
 
 export type TLocalGuardian = {
   name: string;
   occupation: string;
-  contactNumber: string;
-  emailAddress: string;
-  address: {
-    village: string;
-    city: string;
-    home: string;
-  };
+  contactNo: string;
+  address: string;
 };
 
 export type TStudent = {
   id: string;
-  name: TName;
-  dateOfBirth: string;
-  age: number;
+  user: Types.ObjectId;
+  password: string;
+  name: TUserName;
+  gender: 'male' | 'female' | 'other';
+  dateOfBirth?: string;
   email: string;
-  gender: 'male' | 'female';
-  contactNumber: string;
+  contactNo: string;
+  emergencyContactNo: string;
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   presentAddress: string;
   permanentAddress: string;
   guardian: TGuardian;
   localGuardian: TLocalGuardian;
-  profilePic: string;
-  isActive: 'active' | 'blocked';
+  profileImg?: string;
+  isDeleted: boolean;
 };
 
-// creating custom methods
-export type StudentMethods = {
-  isUserExist: (id: string) => Promise<TStudent | null>
+// creating custom static method
+export interface StudentModel extends Model<TStudent> {
+  // eslint-disable-next-line no-unused-vars
+  isUserExist: (id: string) => Promise<TStudent | null>;
 }
 
-export type StudentModel = Model<TStudent, Record<string, never>, StudentMethods>
+// creating custom  instance method
+// export type StudentMethods = {
+//   isUserExist: (id: string) => Promise<TStudent | null>
+// }
+
+// export type StudentModel = Model<TStudent, Record<string, never>, StudentMethods>
