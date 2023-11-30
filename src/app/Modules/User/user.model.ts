@@ -1,8 +1,8 @@
-import { Schema, model } from 'mongoose';
-import { IUser } from './user.interface';
 import bcrypt, { genSaltSync } from 'bcryptjs';
+import { Schema, model } from 'mongoose';
+import { TUser } from './user.interface';
 
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<TUser>(
   {
     id: {
       type: String,
@@ -49,5 +49,5 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-const User = model('User', userSchema);
+const User = model<TUser>('User', userSchema);
 export default User;
