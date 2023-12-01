@@ -11,24 +11,18 @@ const saveStudentsInDB = async (password: string, payload: TStudent) => {
   // set password
   newUser.password = password || (config.defaultPassword as string);
 
-
-
-  // set student id
-  // newUser.id = payload.id || '2030100001'
-
-  // set user role
-
   newUser.role = 'student';
 
   // find academic semester info
-  const admissionSemester = await AcademicSemester.findById(payload.admissionSemester)
+  const admissionSemester = await AcademicSemester.findById(
+    payload.admissionSemester,
+  );
 
   if (admissionSemester && Object.keys(admissionSemester).length) {
-    newUser.id = generateStudentId(admissionSemester)
+    newUser.id = await generateStudentId(admissionSemester);
   } else {
-    throw new Error("Admission Semester not found")
+    throw new Error('Admission Semester not found');
   }
-
 
   const result = await User.create(newUser);
 

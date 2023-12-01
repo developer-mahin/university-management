@@ -25,14 +25,13 @@ const updateSemester = async (
   id: string,
   payload: Partial<TAcademicSemester>,
 ) => {
-
   const isExist = await AcademicSemester.exists({
     year: payload.year,
-    name: payload.name
-  })
+    name: payload.name,
+  });
 
   if (isExist) {
-    throw new Error("Semester already exist, you can't update!")
+    throw new Error("Semester already exist, you can't update!");
   }
 
   if (
@@ -42,7 +41,6 @@ const updateSemester = async (
   ) {
     throw new Error('Invalid Semester Code');
   }
-
 
   const result = await AcademicSemester.findByIdAndUpdate(
     { _id: id },
