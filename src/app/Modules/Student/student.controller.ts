@@ -26,10 +26,10 @@ const getSingleStudent = catchAsync(async (req, res) => {
   });
 });
 
-const deleteUserFromDB = catchAsync(async (req, res) => {
+const deleteStudent = catchAsync(async (req, res) => {
   const { studentId } = req.params;
   if (!studentId) {
-    throw createError(404, 'id not found');
+    throw createError(404, 'Id not found');
   }
   await studentServicer.deleteStudentFromDB(studentId);
   sendResponse(res, {
@@ -40,8 +40,24 @@ const deleteUserFromDB = catchAsync(async (req, res) => {
   });
 });
 
+const updateStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+  if (!studentId) {
+    throw createError(404, 'Id not found');
+  }
+  const result = await studentServicer.updateStudent(studentId, req.body);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: 'successfully delete a user',
+    data: result,
+  });
+});
+
 export const studentController = {
   getALlStudent,
   getSingleStudent,
-  deleteUserFromDB,
+  deleteStudent,
+  updateStudent,
 };
