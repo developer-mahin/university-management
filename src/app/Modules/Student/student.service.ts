@@ -5,8 +5,27 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import User from '../User/user.model';
 
-const getALlStudentFromDB = async () => {
-  const result = await Student.find({})
+const getALlStudentFromDB = async (query: Record<string, unknown>) => {
+  const studentSearchableField = ['email', 'name.firstName', 'presentAddress'];
+
+  const queryObj = { ...query };
+
+  let searchTerm = '';
+  if (query?.searchTerm) {
+    searchTerm = query?.searchTerm as string;
+  }
+
+  const searchQuery = Student.find({
+    $or: studentSearchableField.map((field) => ({
+      [field]: { $regex: searchTerm, $options: 'i' },
+    })),
+  });
+
+  const excludesField = ['searchTerm', 'sort', 'limit'];
+  excludesField.forEach((el) => delete queryObj[el]);
+
+  const filterQuery = searchQuery
+    .find(queryObj)
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',
@@ -17,7 +36,20 @@ const getALlStudentFromDB = async () => {
       ],
     })
     .populate('user');
-  return result;
+
+  let sort = '-createdAt';
+  if (query.sort) {
+    sort = query.sort as string;
+  }
+  const sortQuery = filterQuery.sort(sort);
+
+  let limit = 1;
+  if (query.limit) {
+    limit = query.limit as number;
+  }
+
+  const limitQuery = await sortQuery.limit(limit);
+  return limitQuery;
 };
 
 const getSingleStudentFromDB = async (id: string) => {

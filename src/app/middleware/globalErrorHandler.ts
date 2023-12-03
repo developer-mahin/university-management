@@ -27,22 +27,18 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  }
-  else if (error?.name === "ValidationError") {
-    const simplifiedError = handleValidationError(error)
+  } else if (error?.name === 'ValidationError') {
+    const simplifiedError = handleValidationError(error);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  }
-  else if (error?.name === "CastError") {
-    const simplifiedError = handleCastError(error)
+  } else if (error?.name === 'CastError') {
+    const simplifiedError = handleCastError(error);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  }
-
-  else if (error?.code === 11000) {
-    const simplifiedError = handleDuplicateError(error)
+  } else if (error?.code === 11000) {
+    const simplifiedError = handleDuplicateError(error);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;

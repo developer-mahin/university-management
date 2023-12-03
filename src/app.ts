@@ -15,7 +15,7 @@ app.use(cors());
 // get all routers
 app.use('/api/v1', router);
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', async (req: Request, res: Response) => {
   res.json({
     message: 'Hello developer welcome the server',
   });
@@ -26,21 +26,5 @@ app.use(notFound);
 
 // global error handling middleware
 app.use(globalErrorHandler);
-
-// app.use((
-//   error: any,
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   const statusCode = error.status || 500;
-//   const message = error.message || 'something went wrong';
-
-//   return res.status(statusCode).json({
-//     success: false,
-//     message: message,
-//     error,
-//   });
-// });
 
 export default app;
