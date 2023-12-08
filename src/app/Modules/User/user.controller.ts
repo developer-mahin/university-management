@@ -3,6 +3,7 @@ import { userServices } from './user.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
+import AppError from '../../utils/AppError';
 
 const createStudents = catchAsync(async (req, res) => {
   const { password, student: studentData } = req.body;
@@ -20,6 +21,23 @@ const createStudents = catchAsync(async (req, res) => {
   });
 });
 
+const createFaculty = catchAsync(async (req, res) => {
+  const { password, faculty: facultyData } = req.body;
+  if (!password || !facultyData) {
+    throw new AppError(404, 'Data not found');
+  }
+
+  const result = await userServices.createFaculty(password, facultyData);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: 'successfully created the faculty',
+    data: result,
+  });
+});
+
 export const userController = {
   createStudents,
+  createFaculty,
 };

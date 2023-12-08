@@ -5,21 +5,28 @@ import { TStudent } from '../Student/student.interface';
 import Student from '../Student/student.model';
 import { TUser } from './user.interface';
 import User from './user.model';
-import { generateStudentId } from './user.utils';
+import { generateFacultyId, generateStudentId } from './user.utils';
 import createError from 'http-errors';
 import httpStatus from 'http-status';
+import { TFaculty } from '../Faculty/faculty.interface';
+import Faculty from '../Faculty/faculty.model';
+import AppError from '../../utils/AppError';
+import AcademicDepartment from '../AcademicDepartment/academicDepartment.model';
 
 const saveStudentsInDB = async (password: string, payload: TStudent) => {
   const newUser: Partial<TUser> = {};
   // set password
   newUser.password = password || (config.defaultPassword as string);
-
   newUser.role = 'student';
 
   // find academic semester info
   const admissionSemester = await AcademicSemester.findById(
     payload.admissionSemester,
   );
+
+  if (!admissionSemester) {
+    throw new AppError(404, "admissionSemester didn't found");
+  }
 
   const session = await mongoose.startSession();
   try {
@@ -56,6 +63,53 @@ const saveStudentsInDB = async (password: string, payload: TStudent) => {
   }
 };
 
+const createFaculty = async (password: string, payload: TFaculty) => {
+  const facultyData: Partial<TUser> = {};
+  facultyData.role = 'faculty';
+  facultyData.password = password || config.defaultPassword;
+
+  const session = await mongoose.startSession();
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+
+  if (!academicDepartment) {
+    throw new AppError(404, "Academic Department didn't found");
+  }
+
+  try {
+    session.startTransaction();
+    facultyData.id = await generateFacultyId();
+
+    const createdUser = await User.create([facultyData], { session });
+
+    if (!createdUser.length) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "user does'nt created something went wrong!",
+      );
+    }
+
+    payload.id = createdUser[0].id;
+    payload.user = createdUser[0]._id;
+    const newFaculty = await Faculty.create([payload], { session });
+    if (!newFaculty) {
+      throw new AppError(400, "Faculty didn't created !");
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+    return newFaculty;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(404, error.message);
+  }
+};
+
 export const userServices = {
   saveStudentsInDB,
+  createFaculty,
 };
