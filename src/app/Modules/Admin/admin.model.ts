@@ -1,12 +1,12 @@
 import { Schema, model } from 'mongoose';
 import {
-  TFaculty,
-  TFacultyName,
+  TAdmin,
+  TAdminName,
   TPermanentAddress,
   TPresentAddress,
-} from './faculty.interface';
+} from './admin.interface';
 
-const facultyNameSchema = new Schema<TFacultyName>({
+const facultyNameSchema = new Schema<TAdminName>({
   firstName: {
     type: String,
     required: [true, 'First name is required'],
@@ -50,7 +50,7 @@ const permanentAddressSchema = new Schema<TPermanentAddress>({
   },
 });
 
-const facultySchema = new Schema<TFaculty>(
+const adminSchema = new Schema<TAdmin>(
   {
     id: {
       type: String,
@@ -109,10 +109,6 @@ const facultySchema = new Schema<TFaculty>(
       type: String,
       required: [true, 'Profile image is required'],
     },
-    academicDepartment: {
-      type: Schema.Types.ObjectId,
-      ref: 'AcademicDepartment',
-    },
     isDeleted: {
       type: Boolean,
       required: [true, 'Deletion status is required'],
@@ -127,9 +123,9 @@ const facultySchema = new Schema<TFaculty>(
   },
 );
 
-facultySchema.virtual('fullName').get(function () {
+adminSchema.virtual('fullName').get(function () {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 
-const Faculty = model<TFaculty>('Faculty', facultySchema);
-export default Faculty;
+const Admin = model<TAdmin>('Admin', adminSchema);
+export default Admin;

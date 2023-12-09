@@ -5,13 +5,19 @@ import { TStudent } from '../Student/student.interface';
 import Student from '../Student/student.model';
 import { TUser } from './user.interface';
 import User from './user.model';
-import { generateFacultyId, generateStudentId } from './user.utils';
+import {
+  generateAdminId,
+  generateFacultyId,
+  generateStudentId,
+} from './user.utils';
 import createError from 'http-errors';
 import httpStatus from 'http-status';
 import { TFaculty } from '../Faculty/faculty.interface';
 import Faculty from '../Faculty/faculty.model';
 import AppError from '../../utils/AppError';
 import AcademicDepartment from '../AcademicDepartment/academicDepartment.model';
+import { TAdmin } from '../Admin/admin.interface';
+import Admin from '../Admin/admin.model';
 
 const saveStudentsInDB = async (password: string, payload: TStudent) => {
   const newUser: Partial<TUser> = {};
@@ -109,7 +115,48 @@ const createFaculty = async (password: string, payload: TFaculty) => {
   }
 };
 
+const createAdmin = async (password: string, payload: TAdmin) => {
+  const adminData: Partial<TUser> = {};
+  adminData.password = password || config.defaultPassword;
+  adminData.role = 'admin';
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+    const lastId = await generateAdminId();
+    if (!lastId) {
+      throw new AppError(404, "Admin id not found")
+    }
+    adminData.id = lastId
+    const createNewUser = await User.create([adminData], { session });
+
+    if (!createNewUser.length) {
+      throw new AppError(400, "user doesn't created")
+    }
+
+    payload.id = createNewUser[0].id
+    payload.user = createNewUser[0]._id
+
+    const createNewAdmin = await Admin.create([payload], { session });
+    if (!createNewAdmin) {
+      throw new AppError(httpStatus.BAD_REQUEST, "admin doesn't created!")
+    }
+
+    await session.commitTransaction()
+    await session.endSession()
+
+    return createNewAdmin;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(500, error.message);
+  }
+};
+
 export const userServices = {
   saveStudentsInDB,
   createFaculty,
+  createAdmin,
 };

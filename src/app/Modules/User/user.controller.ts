@@ -37,7 +37,24 @@ const createFaculty = catchAsync(async (req, res) => {
   });
 });
 
+const createAdmin = catchAsync(async (req, res) => {
+  const { password, admin: adminData } = req.body;
+  if (!password || !adminData) {
+    throw new AppError(404, 'admin data not found');
+  }
+
+  const result = await userServices.createAdmin(password, adminData);
+
+  sendResponse(res, {
+    success: true,
+    status: httpStatus.OK,
+    message: 'successfully created the admin',
+    data: result,
+  });
+});
+
 export const userController = {
   createStudents,
   createFaculty,
+  createAdmin,
 };
