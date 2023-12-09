@@ -1,10 +1,5 @@
 import { Schema, model } from 'mongoose';
-import {
-  TFaculty,
-  TFacultyName,
-  TPermanentAddress,
-  TPresentAddress,
-} from './faculty.interface';
+import { TFaculty, TFacultyName } from './faculty.interface';
 
 const facultyNameSchema = new Schema<TFacultyName>({
   firstName: {
@@ -17,36 +12,6 @@ const facultyNameSchema = new Schema<TFacultyName>({
   lastName: {
     type: String,
     required: [true, 'Last name is required'],
-  },
-});
-
-const presentAddressSchema = new Schema<TPresentAddress>({
-  city: {
-    type: String,
-    required: [true, 'City is required'],
-  },
-  home: {
-    type: String,
-    required: [true, 'Home is required'],
-  },
-  house: {
-    type: String,
-    required: [true, 'House is required'],
-  },
-});
-
-const permanentAddressSchema = new Schema<TPermanentAddress>({
-  city: {
-    type: String,
-    required: [true, 'City is required'],
-  },
-  home: {
-    type: String,
-    required: [true, 'Home is required'],
-  },
-  house: {
-    type: String,
-    required: [true, 'House is required'],
   },
 });
 
@@ -98,11 +63,11 @@ const facultySchema = new Schema<TFaculty>(
       required: [true, 'Emergency contact number is required'],
     },
     presentAddress: {
-      type: presentAddressSchema,
+      type: String,
       required: [true, 'Present Address is required'],
     },
     permanentAddress: {
-      type: permanentAddressSchema,
+      type: String,
       required: [true, 'permanentAddress is required'],
     },
     profileImage: {
@@ -129,6 +94,18 @@ const facultySchema = new Schema<TFaculty>(
 
 facultySchema.virtual('fullName').get(function () {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
+});
+
+facultySchema.pre('find', async function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+facultySchema.pre('findOne', async function (next) {
+  this.findOne({
+    isDeleted: { $ne: true },
+  });
+  next();
 });
 
 const Faculty = model<TFaculty>('Faculty', facultySchema);

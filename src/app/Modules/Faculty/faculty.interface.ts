@@ -6,18 +6,6 @@ export type TFacultyName = {
   lastName: string;
 };
 
-export type TPresentAddress = {
-  city: string;
-  home: string;
-  house: string;
-};
-
-export type TPermanentAddress = {
-  city: string;
-  home: string;
-  house: string;
-};
-
 export type TBloodGroup =
   | 'A+'
   | 'A-'
@@ -39,8 +27,8 @@ export type TFaculty = {
   email: string;
   contactNo: string;
   emergencyContactNo: string;
-  presentAddress: TPresentAddress;
-  permanentAddress: TPermanentAddress;
+  presentAddress: string;
+  permanentAddress: string;
   profileImage: string;
   academicDepartment?: Types.ObjectId;
   isDeleted: boolean;

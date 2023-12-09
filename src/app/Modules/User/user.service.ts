@@ -126,25 +126,25 @@ const createAdmin = async (password: string, payload: TAdmin) => {
     session.startTransaction();
     const lastId = await generateAdminId();
     if (!lastId) {
-      throw new AppError(404, "Admin id not found")
+      throw new AppError(404, 'Admin id not found');
     }
-    adminData.id = lastId
+    adminData.id = lastId;
     const createNewUser = await User.create([adminData], { session });
 
     if (!createNewUser.length) {
-      throw new AppError(400, "user doesn't created")
+      throw new AppError(400, "user doesn't created");
     }
 
-    payload.id = createNewUser[0].id
-    payload.user = createNewUser[0]._id
+    payload.id = createNewUser[0].id;
+    payload.user = createNewUser[0]._id;
 
     const createNewAdmin = await Admin.create([payload], { session });
     if (!createNewAdmin) {
-      throw new AppError(httpStatus.BAD_REQUEST, "admin doesn't created!")
+      throw new AppError(httpStatus.BAD_REQUEST, "admin doesn't created!");
     }
 
-    await session.commitTransaction()
-    await session.endSession()
+    await session.commitTransaction();
+    await session.endSession();
 
     return createNewAdmin;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

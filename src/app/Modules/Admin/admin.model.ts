@@ -1,10 +1,5 @@
 import { Schema, model } from 'mongoose';
-import {
-  TAdmin,
-  TAdminName,
-  TPermanentAddress,
-  TPresentAddress,
-} from './admin.interface';
+import { TAdmin, TAdminName } from './admin.interface';
 
 const facultyNameSchema = new Schema<TAdminName>({
   firstName: {
@@ -17,36 +12,6 @@ const facultyNameSchema = new Schema<TAdminName>({
   lastName: {
     type: String,
     required: [true, 'Last name is required'],
-  },
-});
-
-const presentAddressSchema = new Schema<TPresentAddress>({
-  city: {
-    type: String,
-    required: [true, 'City is required'],
-  },
-  home: {
-    type: String,
-    required: [true, 'Home is required'],
-  },
-  house: {
-    type: String,
-    required: [true, 'House is required'],
-  },
-});
-
-const permanentAddressSchema = new Schema<TPermanentAddress>({
-  city: {
-    type: String,
-    required: [true, 'City is required'],
-  },
-  home: {
-    type: String,
-    required: [true, 'Home is required'],
-  },
-  house: {
-    type: String,
-    required: [true, 'House is required'],
   },
 });
 
@@ -98,11 +63,11 @@ const adminSchema = new Schema<TAdmin>(
       required: [true, 'Emergency contact number is required'],
     },
     presentAddress: {
-      type: presentAddressSchema,
+      type: String,
       required: [true, 'Present Address is required'],
     },
     permanentAddress: {
-      type: permanentAddressSchema,
+      type: String,
       required: [true, 'permanentAddress is required'],
     },
     profileImage: {
@@ -125,6 +90,21 @@ const adminSchema = new Schema<TAdmin>(
 
 adminSchema.virtual('fullName').get(function () {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
+});
+
+adminSchema.pre('find', async function (next) {
+  this.find({
+    isDeleted: { $ne: true },
+  });
+  next();
+});
+
+adminSchema.pre('findOne', async function (next) {
+  this.findOne({
+    isDeleted: { $ne: true },
+  });
+
+  next();
 });
 
 const Admin = model<TAdmin>('Admin', adminSchema);

@@ -6,18 +6,6 @@ export type TAdminName = {
   lastName: string;
 };
 
-export type TPresentAddress = {
-  city: string;
-  home: string;
-  house: string;
-};
-
-export type TPermanentAddress = {
-  city: string;
-  home: string;
-  house: string;
-};
-
 export type TBloodGroup =
   | 'A+'
   | 'A-'
@@ -39,8 +27,8 @@ export type TAdmin = {
   email: string;
   contactNo: string;
   emergencyContactNo: string;
-  presentAddress: TPresentAddress;
-  permanentAddress: TPermanentAddress;
+  presentAddress: string;
+  permanentAddress: string;
   profileImage: string;
   isDeleted: boolean;
 };
