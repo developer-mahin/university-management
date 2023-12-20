@@ -9,4 +9,5 @@ export default {
   database_url: process.env.DATABASE_URL,
   salt_round: process.env.SALT_ROUND,
   defaultPassword: process.env.DEFAULT_PASSWORD,
+  access_token: process.env.ACCESS_TOKEN,
 };
