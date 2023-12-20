@@ -37,9 +37,9 @@ const SemesterRegistrationSchema = new Schema<TSemesterRegistration>(
   },
 );
 
-const semesterRegistration = model<TSemesterRegistration>(
+const SemesterRegistration = model<TSemesterRegistration>(
   'SemesterRegistration ',
   SemesterRegistrationSchema,
 );
 
-export default semesterRegistration;
+export default SemesterRegistration;

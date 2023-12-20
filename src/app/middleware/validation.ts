@@ -9,7 +9,7 @@ const validateRequest = (schema: AnyZodObject) => {
       });
       next();
     } catch (error) {
-      next();
+      next(error);
     }
   };
 };

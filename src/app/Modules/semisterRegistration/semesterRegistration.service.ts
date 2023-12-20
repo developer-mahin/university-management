@@ -4,12 +4,12 @@ import AppError from '../../utils/AppError';
 import AcademicSemester from '../AcademicSemester/academicSemester.model';
 import { registrationStatus } from './semesterRegistration.constant';
 import { TSemesterRegistration } from './semesterRegistration.interface';
-import semesterRegistration from './semesterRegistration.model';
+import SemesterRegistration from './semesterRegistration.model';
 
 const createSemesterRegistrationInToDB = async (
   payload: TSemesterRegistration,
 ) => {
-  const isThereAnyUpcomingOngoingSemester = await semesterRegistration.findOne({
+  const isThereAnyUpcomingOngoingSemester = await SemesterRegistration.findOne({
     $or: [{ status: 'UPCOMING' }, { status: 'ONGOING' }],
   });
 
@@ -27,7 +27,7 @@ const createSemesterRegistrationInToDB = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Academic semester not found'!);
   }
 
-  const isExistRegister = await semesterRegistration.findOne({
+  const isExistRegister = await SemesterRegistration.findOne({
     _id: payload?.academicSemester,
   });
 
@@ -35,7 +35,7 @@ const createSemesterRegistrationInToDB = async (
     throw new AppError(httpStatus.CONFLICT, 'semester is already exist!');
   }
 
-  const result = await semesterRegistration.create(payload);
+  const result = await SemesterRegistration.create(payload);
   return result;
 };
 
@@ -43,7 +43,7 @@ const getAllSemesterRegistrationFromDB = async (
   query: Record<string, unknown>,
 ) => {
   const semesterRegistrationQuery = new QueryBuilder(
-    semesterRegistration.find().populate('academicSemester'),
+    SemesterRegistration.find().populate('academicSemester'),
     query,
   )
     .fields()
@@ -56,7 +56,7 @@ const getAllSemesterRegistrationFromDB = async (
 };
 
 const getSingleSemesterRegistrationFromDB = async (id: string) => {
-  const result = await semesterRegistration.findById(id);
+  const result = await SemesterRegistration.findById(id);
   return result;
 };
 
@@ -64,7 +64,7 @@ const updateSemesterRegistrationIntoDB = async (
   id: string,
   payload: Partial<TSemesterRegistration>,
 ) => {
-  const isExist = await semesterRegistration.findById(id);
+  const isExist = await SemesterRegistration.findById(id);
   const currentStatus = isExist?.status;
   const requestedStatus = payload.status;
 
@@ -102,11 +102,11 @@ const updateSemesterRegistrationIntoDB = async (
     );
   }
 
-  const result = await semesterRegistration.findByIdAndUpdate(id, payload, {
+  const result = await SemesterRegistration.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
   });
-  
+
   return result;
 };
 
