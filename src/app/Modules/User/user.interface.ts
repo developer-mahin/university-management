@@ -8,12 +8,17 @@ export type TUser = {
   needsPasswordChange: boolean;
   role: 'admin' | 'faculty' | 'student';
   isDeleted: boolean;
+  passwordUpdatedAt?: Date;
   status: 'in-progress' | 'blocked';
 };
 
 export interface UserModel extends Model<TUser> {
   isUserExist(id: string): Promise<TUser>;
   isMatchedPassword(password: string, hashPassword: string): Promise<boolean>;
+  isJWTIssuedBeforePasswordChanged(
+    passwordChangeTimeStamps: Date,
+    jwtIssuedTimeStamps: number,
+  ): boolean;
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

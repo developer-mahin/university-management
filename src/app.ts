@@ -7,9 +7,11 @@ import cors from 'cors';
 import globalErrorHandler from './app/middleware/globalErrorHandler';
 import notFound from './app/middleware/notFound';
 import router from './app/routes';
+import cookieParser from 'cookie-parser';
 
 // parser
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 
 // get all routers
