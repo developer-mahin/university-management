@@ -7,6 +7,7 @@ import User from '../User/user.model';
 import { TAuthentication } from './auth.interface';
 import { createToken } from './auth.utils';
 import jwt from 'jsonwebtoken';
+import { sendEmail } from '../../utils/sendEmial';
 
 const loginUserInToDB = async (payload: TAuthentication) => {
   const { id, password } = payload;
@@ -137,8 +138,73 @@ const refreshToken = async (token: string) => {
   };
 };
 
+const forgotPassword = async (id: string) => {
+  const user = await User.isUserExist(id);
+  if (!user) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User not found');
+  }
+
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User was deleted');
+  }
+
+  if (user.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'you are a block user');
+  }
+
+  const userDate = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    userDate,
+    config.access_token as string,
+    '10m',
+  );
+
+  const generatedLink = `${config.front_end_link}?id=${user?.id}&token=${accessToken}`;
+  sendEmail(user.email, generatedLink);
+};
+
+const resetPassword = async (
+  payload: { id: string; newPassword: string },
+  token: string,
+) => {
+  const user = await User.isUserExist(payload.id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found! Invalid ID!!');
+  }
+
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User was deleted');
+  }
+
+  if (user.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'you are a block user');
+  }
+
+  const decoded = jwt.verify(
+    token,
+    config.access_token as string,
+  ) as JwtPayload;
+
+  if (payload.id !== decoded.userId) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Forbidden access');
+  }
+
+  const hashPassword = await bcrypt.hash(payload.newPassword, 10);
+
+  await User.findOneAndUpdate(
+    { id: payload.id, role: decoded.role },
+    { password: hashPassword, passwordUpdatedAt: new Date() },
+  );
+};
+
 export const authServices = {
   loginUserInToDB,
   changePassword,
   refreshToken,
+  forgotPassword,
+  resetPassword,
 };

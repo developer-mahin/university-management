@@ -13,4 +13,5 @@ export default {
   access_expires_in: process.env.ACCESS_EXPIRES_IN,
   refresh_token: process.env.REFRESH_TOKEN,
   refresh_expires_in: process.env.ACCESS_REFRESH_IN,
+  front_end_link:process.env.FRONT_END_LINK
 };

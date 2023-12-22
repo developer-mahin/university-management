@@ -24,6 +24,7 @@ const saveStudentsInDB = async (password: string, payload: TStudent) => {
   // set password
   newUser.password = password || (config.defaultPassword as string);
   newUser.role = 'student';
+  newUser.email = payload.email;
 
   // find academic semester info
   const admissionSemester = await AcademicSemester.findById(
@@ -73,6 +74,7 @@ const createFaculty = async (password: string, payload: TFaculty) => {
   const facultyData: Partial<TUser> = {};
   facultyData.role = 'faculty';
   facultyData.password = password || config.defaultPassword;
+  facultyData.email = payload.email;
 
   const session = await mongoose.startSession();
   const academicDepartment = await AcademicDepartment.findById(
@@ -119,6 +121,7 @@ const createAdmin = async (password: string, payload: TAdmin) => {
   const adminData: Partial<TUser> = {};
   adminData.password = password || config.defaultPassword;
   adminData.role = 'admin';
+  adminData.email = payload.email;
 
   const session = await mongoose.startSession();
 

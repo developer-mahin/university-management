@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post(
   '/create-students',
-  auth(USER_ROLE.admin),
+  // auth(USER_ROLE.admin),
   validateRequest(studentValidations.createStudentValidationSchema),
   userController.createStudents,
 );
