@@ -18,6 +18,7 @@ import AppError from '../../utils/AppError';
 import AcademicDepartment from '../AcademicDepartment/academicDepartment.model';
 import { TAdmin } from '../Admin/admin.interface';
 import Admin from '../Admin/admin.model';
+import { sendImageIntoCloudinary } from '../../utils/sendImageIntoCloudinary';
 
 const saveStudentsInDB = async (password: string, payload: TStudent) => {
   const newUser: Partial<TUser> = {};
@@ -46,6 +47,8 @@ const saveStudentsInDB = async (password: string, payload: TStudent) => {
     }
     // transaction-1
     const result = await User.create([newUser], { session });
+
+    sendImageIntoCloudinary();
 
     if (!result.length) {
       throw createError(
@@ -158,8 +161,33 @@ const createAdmin = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMe = async (userId: string, role: string) => {
+  let result = null;
+  if (role === 'student') {
+    result = await Student.findOne({ id: userId });
+  }
+  if (role === 'faculty') {
+    result = await Faculty.findOne({ id: userId });
+  }
+  if (role === 'admin') {
+    result = await Admin.findOne({ id: userId });
+  }
+
+  return result;
+};
+
+const changeStatus = async (id: string, payload: Partial<TUser>) => {
+  const result = await User.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
 export const userServices = {
   saveStudentsInDB,
   createFaculty,
   createAdmin,
+  getMe,
+  changeStatus,
 };
