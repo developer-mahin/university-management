@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import config from '../../config';
 import AcademicSemester from '../AcademicSemester/academicSemester.model';
@@ -20,7 +21,11 @@ import { TAdmin } from '../Admin/admin.interface';
 import Admin from '../Admin/admin.model';
 import { sendImageIntoCloudinary } from '../../utils/sendImageIntoCloudinary';
 
-const saveStudentsInDB = async (password: string, payload: TStudent) => {
+const saveStudentsInDB = async (
+  file: any,
+  password: string,
+  payload: TStudent,
+) => {
   const newUser: Partial<TUser> = {};
   // set password
   newUser.password = password || (config.defaultPassword as string);
@@ -48,7 +53,10 @@ const saveStudentsInDB = async (password: string, payload: TStudent) => {
     // transaction-1
     const result = await User.create([newUser], { session });
 
-    sendImageIntoCloudinary();
+    const path = file.path;
+    const fileName = `${newUser.id}-${payload.name.firstName}`;
+
+    const { secure_url } = await sendImageIntoCloudinary(path, fileName);
 
     if (!result.length) {
       throw createError(
@@ -59,6 +67,7 @@ const saveStudentsInDB = async (password: string, payload: TStudent) => {
 
     payload.id = result[0].id;
     payload.user = result[0]._id;
+    payload.profileImg = secure_url;
     // transaction-2
     const newStudent = await Student.create([payload], { session });
 
@@ -73,7 +82,11 @@ const saveStudentsInDB = async (password: string, payload: TStudent) => {
   }
 };
 
-const createFaculty = async (password: string, payload: TFaculty) => {
+const createFaculty = async (
+  file: any,
+  password: string,
+  payload: TFaculty,
+) => {
   const facultyData: Partial<TUser> = {};
   facultyData.role = 'faculty';
   facultyData.password = password || config.defaultPassword;
@@ -101,8 +114,14 @@ const createFaculty = async (password: string, payload: TFaculty) => {
       );
     }
 
+    const path = file.path;
+    const fileName = `${facultyData?.id}-${payload?.name?.firstName}`;
+
+    const { secure_url } = await sendImageIntoCloudinary(path, fileName);
+
     payload.id = createdUser[0].id;
     payload.user = createdUser[0]._id;
+    payload.profileImage = secure_url;
     const newFaculty = await Faculty.create([payload], { session });
     if (!newFaculty) {
       throw new AppError(400, "Faculty didn't created !");
@@ -120,7 +139,7 @@ const createFaculty = async (password: string, payload: TFaculty) => {
   }
 };
 
-const createAdmin = async (password: string, payload: TAdmin) => {
+const createAdmin = async (file: any, password: string, payload: TAdmin) => {
   const adminData: Partial<TUser> = {};
   adminData.password = password || config.defaultPassword;
   adminData.role = 'admin';
@@ -141,8 +160,13 @@ const createAdmin = async (password: string, payload: TAdmin) => {
       throw new AppError(400, "user doesn't created");
     }
 
+    const path = file.path;
+    const fileName = `${adminData.id}-${payload?.name?.firstName}`;
+    const { secure_url } = await sendImageIntoCloudinary(path, fileName);
+
     payload.id = createNewUser[0].id;
     payload.user = createNewUser[0]._id;
+    payload.profileImage = secure_url;
 
     const createNewAdmin = await Admin.create([payload], { session });
     if (!createNewAdmin) {

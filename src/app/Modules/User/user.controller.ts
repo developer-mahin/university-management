@@ -11,7 +11,11 @@ const createStudents = catchAsync(async (req, res) => {
     throw createError(500, 'data not found');
   }
 
-  const result = await userServices.saveStudentsInDB(password, studentData);
+  const result = await userServices.saveStudentsInDB(
+    req.file,
+    password,
+    studentData,
+  );
 
   sendResponse(res, {
     status: httpStatus.OK,
@@ -27,7 +31,11 @@ const createFaculty = catchAsync(async (req, res) => {
     throw new AppError(404, 'Data not found');
   }
 
-  const result = await userServices.createFaculty(password, facultyData);
+  const result = await userServices.createFaculty(
+    req.file,
+    password,
+    facultyData,
+  );
 
   sendResponse(res, {
     status: httpStatus.OK,
@@ -43,7 +51,7 @@ const createAdmin = catchAsync(async (req, res) => {
     throw new AppError(404, 'admin data not found');
   }
 
-  const result = await userServices.createAdmin(password, adminData);
+  const result = await userServices.createAdmin(req.file, password, adminData);
 
   sendResponse(res, {
     success: true,

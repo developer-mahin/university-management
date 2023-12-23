@@ -22,7 +22,7 @@ export const createAdminSchema = z.object({
         .min(1, 'Emergency contact number is required'),
       presentAddress: z.string(),
       permanentAddress: z.string(),
-      profileImage: z.string().min(1, 'Profile image is required'),
+      profileImage: z.string().min(1, 'Profile image is required').optional(),
       academicDepartment: z.string().optional(),
       isDeleted: z.boolean().optional(),
     }),
