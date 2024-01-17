@@ -19,14 +19,16 @@ export const sendImageIntoCloudinary = (path: string, fileName: string) => {
           reject(error);
         }
         resolved(result);
-        // delete a file asynchronously
-        fs.unlink(path, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            console.log('File is deleted.');
-          }
-        });
+
+        if (result) {
+          fs.unlink(path, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              console.log('File is deleted.');
+            }
+          });
+        }
       },
     );
   });

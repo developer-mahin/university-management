@@ -60,7 +60,6 @@ userSchema.post('save', function (doc, next) {
 });
 
 userSchema.statics.isUserExist = async function (id: string) {
-  console.log(id);
   return await User.findOne({ id }).select('+password');
 };
 
