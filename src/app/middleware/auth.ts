@@ -1,11 +1,12 @@
-import httpStatus from 'http-status';
-import AppError from '../utils/AppError';
-import catchAsync from '../utils/catchAsync';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import config from '../config';
 import { NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import { TUserRole } from '../Modules/User/user.interface';
 import User from '../Modules/User/user.model';
+import config from '../config';
+import AppError from '../utils/AppError';
+import catchAsync from '../utils/catchAsync';
+import { verifyToken } from '../utils/verifyToken';
 
 export const auth = (...requestedRole: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +16,7 @@ export const auth = (...requestedRole: TUserRole[]) => {
       throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized');
     }
 
-    const decoded = jwt.verify(
+    const decoded = verifyToken(
       token,
       config.access_token as string,
     ) as JwtPayload;
@@ -47,8 +48,7 @@ export const auth = (...requestedRole: TUserRole[]) => {
     if (user.status === 'blocked') {
       throw new AppError(httpStatus.CONFLICT, 'You are a blocked user');
     }
-    
-    
+
     req.user = decoded as JwtPayload;
     next();
   });

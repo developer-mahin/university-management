@@ -18,7 +18,7 @@ const getAllSemester = catchAsync(async (req, res) => {
   const result = await academicSemesterService.getAllSemester();
 
   sendResponse(res, {
-    status: httpStatus.FOUND,
+    status: httpStatus.OK,
     success: true,
     message: 'successfully get all semester',
     data: result,
@@ -43,7 +43,7 @@ const updateSemester = catchAsync(async (req, res) => {
   const result = await academicSemesterService.updateSemester(id, req.body);
 
   sendResponse(res, {
-    status: httpStatus.FOUND,
+    status: httpStatus.OK,
     success: true,
     message: 'successfully get all semester',
     data: result,

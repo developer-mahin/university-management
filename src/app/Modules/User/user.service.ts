@@ -41,6 +41,17 @@ const saveStudentsInDB = async (
     throw new AppError(404, "admissionSemester didn't found");
   }
 
+  // find academic department info
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+
+  if (!academicDepartment) {
+    throw new AppError(404, "Academic Department didn't found");
+  }
+
+  payload.academicFaculty = academicDepartment.academicFaculty;
+
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -53,10 +64,13 @@ const saveStudentsInDB = async (
     // transaction-1
     const result = await User.create([newUser], { session });
 
-    const path = file.path;
-    const fileName = `${newUser.id}-${payload.name.firstName}`;
+    if (file) {
+      const path = file.path;
+      const fileName = `${newUser.id}-${payload.name.firstName}`;
 
-    const { secure_url } = await sendImageIntoCloudinary(path, fileName);
+      const { secure_url } = await sendImageIntoCloudinary(path, fileName);
+      payload.profileImage = secure_url as string;
+    }
 
     if (!result.length) {
       throw createError(
@@ -67,7 +81,7 @@ const saveStudentsInDB = async (
 
     payload.id = result[0].id;
     payload.user = result[0]._id;
-    payload.profileImg = secure_url;
+
     // transaction-2
     const newStudent = await Student.create([payload], { session });
 
@@ -101,6 +115,8 @@ const createFaculty = async (
     throw new AppError(404, "Academic Department didn't found");
   }
 
+  payload.academicFaculty = academicDepartment.academicFaculty;
+
   try {
     session.startTransaction();
     facultyData.id = await generateFacultyId();
@@ -114,14 +130,17 @@ const createFaculty = async (
       );
     }
 
-    const path = file.path;
-    const fileName = `${facultyData?.id}-${payload?.name?.firstName}`;
+    if (file) {
+      const path = file.path;
+      const fileName = `${facultyData?.id}-${payload?.name?.firstName}`;
 
-    const { secure_url } = await sendImageIntoCloudinary(path, fileName);
+      const { secure_url } = await sendImageIntoCloudinary(path, fileName);
+      payload.profileImage = secure_url as string;
+    }
 
     payload.id = createdUser[0].id;
     payload.user = createdUser[0]._id;
-    payload.profileImage = secure_url;
+
     const newFaculty = await Faculty.create([payload], { session });
     if (!newFaculty) {
       throw new AppError(400, "Faculty didn't created !");
@@ -160,13 +179,15 @@ const createAdmin = async (file: any, password: string, payload: TAdmin) => {
       throw new AppError(400, "user doesn't created");
     }
 
-    const path = file.path;
-    const fileName = `${adminData.id}-${payload?.name?.firstName}`;
-    const { secure_url } = await sendImageIntoCloudinary(path, fileName);
+    if (file) {
+      const path = file.path;
+      const fileName = `${adminData.id}-${payload?.name?.firstName}`;
+      const { secure_url } = await sendImageIntoCloudinary(path, fileName);
+      payload.profileImage = secure_url as string;
+    }
 
     payload.id = createNewUser[0].id;
     payload.user = createNewUser[0]._id;
-    payload.profileImage = secure_url;
 
     const createNewAdmin = await Admin.create([payload], { session });
     if (!createNewAdmin) {
