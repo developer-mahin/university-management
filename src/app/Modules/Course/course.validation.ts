@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const createPreRequisiteCoursesSchema = z.object({
   course: z.string(),
-  idDeleted: z.boolean(),
+  isDeleted: z.boolean(),
 });
 
 const createCourseValidationSchema = z.object({
@@ -17,7 +17,7 @@ const createCourseValidationSchema = z.object({
 
 const updatePreRequisiteCoursesSchema = z.object({
   course: z.string().optional(),
-  idDeleted: z.boolean().optional(),
+  isDeleted: z.boolean().optional(),
 });
 
 const updateCourseValidationSchema = z.object({

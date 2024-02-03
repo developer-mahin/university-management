@@ -49,10 +49,3 @@ export interface StudentModel extends Model<TStudent> {
   // eslint-disable-next-line no-unused-vars
   isUserExist: (id: string) => Promise<TStudent | null>;
 }
-
-// creating custom  instance method
-// export type StudentMethods = {
-//   isUserExist: (id: string) => Promise<TStudent | null>
-// }
-
-// export type StudentModel = Model<TStudent, Record<string, never>, StudentMethods>

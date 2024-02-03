@@ -155,7 +155,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: Schema.Types.ObjectId,
       ref: 'AcademicFaculty',
     },
-    profileImage: { type: String },
+    profileImage: {
+      type: String,
+      default: '',
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -200,11 +203,6 @@ studentSchema.statics.isUserExist = async function (id: string) {
   const existUser = await Student.findOne({ id });
   return existUser;
 };
-
-// studentSchema.methods.isUserExist = async function (id: string) {
-//   const userExist = await Student.findOne({ id })
-//   return userExist
-// }
 
 const Student = model<TStudent, StudentModel>('Student', studentSchema);
 export default Student;

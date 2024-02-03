@@ -6,8 +6,8 @@ const createSemesterRegistrationSchema = z.object({
       message: 'Academic semester is required',
     }),
     status: z.enum(['UPCOMING', 'ONGOING', 'ENDED']).default('UPCOMING'),
-    startDate: z.date(),
-    endDate: z.date(),
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
     minCredit: z.number(),
     maxCredit: z.number(),
   }),
@@ -25,8 +25,8 @@ const updateSemesterRegistrationSchema = z.object({
       .enum(['UPCOMING', 'ONGOING', 'ENDED'])
       .default('UPCOMING')
       .optional(),
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
+    startDate: z.string().datetime().optional(),
+    endDate: z.string().datetime().optional(),
     minCredit: z.number().optional(),
     maxCredit: z.number().optional(),
   }),

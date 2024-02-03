@@ -9,15 +9,24 @@ const router = Router();
 
 router.get(
   '/',
-  auth(USER_ROLE.admin, USER_ROLE.faculty),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   facultyController.getAllFaculties,
 );
-router.get('/:id', facultyController.getSingleFaculty);
+router.get(
+  '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+  facultyController.getSingleFaculty,
+);
 router.patch(
   '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(facultySchemaValidation.updateFacultySchema),
   facultyController.updateFaculty,
 );
-router.delete('/:id', facultyController.deleteFaculty);
+router.delete(
+  '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  facultyController.deleteFaculty,
+);
 
 export const facultyRoutes = router;

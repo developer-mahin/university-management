@@ -1,18 +1,18 @@
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import AppError from '../../utils/AppError';
-import Student from '../Student/student.model';
-import OfferCourse from '../offeredCourse/offeredCourse.model';
-import { TEnrolledCourse } from './enrolledCourse.interface';
-import EnrolledCourse from './enrolledCourse.model';
-import SemesterRegistration from '../semisterRegistration/semesterRegistration.model';
 import { Course } from '../Course/course.model';
 import Faculty from '../Faculty/faculty.model';
+import Student from '../Student/student.model';
+import OfferedCourse from '../offeredCourse/offeredCourse.model';
+import SemesterRegistration from '../semisterRegistration/semesterRegistration.model';
+import { TEnrolledCourse } from './enrolledCourse.interface';
+import EnrolledCourse from './enrolledCourse.model';
 import { calculateMarksAndGrade } from './enrolledCourse.utils';
 
 const enrolledCourse = async (userId: string, payload: TEnrolledCourse) => {
   const { offeredCourse } = payload;
-  const isOfferedCourseExist = await OfferCourse.findById(offeredCourse);
+  const isOfferedCourseExist = await OfferedCourse.findById(offeredCourse);
 
   if (!isOfferedCourseExist) {
     throw new AppError(httpStatus.NOT_FOUND, 'Offered course not found');
@@ -126,7 +126,7 @@ const enrolledCourse = async (userId: string, payload: TEnrolledCourse) => {
     if (maxCapacity < 0) {
       throw new AppError(httpStatus.CONFLICT, 'Room is full');
     }
-    await OfferCourse.findByIdAndUpdate(offeredCourse, {
+    await OfferedCourse.findByIdAndUpdate(offeredCourse, {
       maxCapacity: maxCapacity - 1,
     });
 
@@ -157,7 +157,7 @@ const updateEnrolledCourseMarks = async (
     );
   }
 
-  const isOfferedCourseExist = await OfferCourse.findById(offeredCourse);
+  const isOfferedCourseExist = await OfferedCourse.findById(offeredCourse);
   if (!isOfferedCourseExist) {
     throw new AppError(
       httpStatus.NOT_FOUND,

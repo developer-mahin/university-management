@@ -61,6 +61,6 @@ const offerCourseSchema = new Schema<TOfferCourse>(
   },
 );
 
-const OfferCourse = model<TOfferCourse>('OfferCourse', offerCourseSchema);
+const OfferedCourse = model<TOfferCourse>('OfferedCourse', offerCourseSchema);
 
-export default OfferCourse;
+export default OfferedCourse;
