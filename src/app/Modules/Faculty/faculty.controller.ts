@@ -7,11 +7,13 @@ import AppError from '../../utils/AppError';
 const getAllFaculties = catchAsync(async (req, res) => {
   const query = req.query;
   const result = await facultyServices.getAllFaculties(query);
+  
   sendResponse(res, {
     success: true,
     status: httpStatus.OK,
     message: 'successfully get all faculties',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 

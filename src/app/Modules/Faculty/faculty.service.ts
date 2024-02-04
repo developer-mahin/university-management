@@ -12,12 +12,7 @@ const getAllFaculties = async (query: Record<string, unknown>) => {
   const faculTyQuery = new QueryBuilder(
     Faculty.find({})
       .populate('user')
-      .populate({
-        path: 'academicDepartment',
-        populate: {
-          path: 'academicFaculty',
-        },
-      }),
+      .populate('academicDepartment academicFaculty'),
     query,
   )
     .search(searchableField)
@@ -27,18 +22,15 @@ const getAllFaculties = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await faculTyQuery.queryModel;
-  return result;
+  const meta = await faculTyQuery.countTotal();
+
+  return { meta, result };
 };
 
 const getSingleFaculty = async (id: string) => {
   const result = await Faculty.findOne({ id })
     .populate('user')
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    });
+    .populate('academicDepartment academicFaculty');
 
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, 'user not found with this id');

@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 import config from '../config';
 import multer from 'multer';
 import fs from 'fs';
@@ -21,7 +21,7 @@ export const sendImageIntoCloudinary = (
         if (error) {
           reject(error);
         }
-        resolved(result);
+        resolved(result as UploadApiResponse);
 
         if (result) {
           fs.unlink(path, (err) => {

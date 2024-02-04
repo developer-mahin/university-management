@@ -12,7 +12,8 @@ const getAllAdmins = catchAsync(async (req, res) => {
     status: httpStatus.OK,
     success: true,
     message: 'successfully get all admins',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 

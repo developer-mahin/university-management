@@ -7,9 +7,27 @@ import mongoose from 'mongoose';
 import User from '../User/user.model';
 
 const getAllAdmins = async (query: Record<string, unknown>) => {
-  const adminQuery = new QueryBuilder(Admin.find({}).populate('user'), query);
-  const result = adminQuery.queryModel;
-  return result;
+  const AdminSearchableFields = [
+    'email',
+    'id',
+    'contactNo',
+    'emergencyContactNo',
+    'name.firstName',
+    'name.lastName',
+    'name.middleName',
+  ];
+
+  const adminQuery = new QueryBuilder(Admin.find({}).populate('user'), query)
+    .search(AdminSearchableFields)
+    .filter()
+    .fields()
+    .sort()
+    .paginate();
+
+  const result = await adminQuery.queryModel;
+  const meta = await adminQuery.countTotal();
+
+  return { meta, result };
 };
 
 const getSingleAdmin = async (id: string) => {

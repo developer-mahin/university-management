@@ -127,7 +127,12 @@ const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await offeredCourseQuery.queryModel;
-  return result;
+  const meta = await offeredCourseQuery.countTotal();
+  
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {

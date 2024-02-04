@@ -1,25 +1,18 @@
 import createError from 'http-errors';
-import { TStudent } from './student.interface';
-import Student from './student.model';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
-import User from '../User/user.model';
 import QueryBuilder from '../../QueryBuilder/QueryBuilder';
+import User from '../User/user.model';
+import { TStudent } from './student.interface';
+import Student from './student.model';
 
 const getALlStudentFromDB = async (query: Record<string, unknown>) => {
   const studentSearchableField = ['email', 'name.firstName', 'presentAddress'];
   const studentQuery = new QueryBuilder(
     Student.find()
+      .populate('user')
       .populate('admissionSemester')
-      .populate({
-        path: 'academicDepartment',
-        populate: [
-          {
-            path: 'academicFaculty',
-          },
-        ],
-      })
-      .populate('user'),
+      .populate('academicDepartment academicFaculty'),
     query,
   )
     .search(studentSearchableField)
@@ -27,8 +20,11 @@ const getALlStudentFromDB = async (query: Record<string, unknown>) => {
     .sort()
     .paginate()
     .fields();
+
   const result = await studentQuery.queryModel;
-  return result;
+  const meta = await studentQuery.countTotal();
+
+  return { meta, result };
 };
 
 const getSingleStudentFromDB = async (id: string) => {
@@ -40,14 +36,8 @@ const getSingleStudentFromDB = async (id: string) => {
   const result = await Student.findOne({ id: id })
     .populate('user')
     .populate('admissionSemester')
-    .populate({
-      path: 'academicDepartment',
-      populate: [
-        {
-          path: 'academicFaculty',
-        },
-      ],
-    });
+    .populate('academicDepartment academicFaculty');
+    
   return result;
 };
 
