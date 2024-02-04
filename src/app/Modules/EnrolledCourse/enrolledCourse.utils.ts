@@ -3,7 +3,6 @@ export const calculateMarksAndGrade = (marks: number) => {
     grade: 'NA',
     gradePoints: 0,
   };
-
   if (marks >= 0 && marks <= 19) {
     result = {
       grade: 'F',
