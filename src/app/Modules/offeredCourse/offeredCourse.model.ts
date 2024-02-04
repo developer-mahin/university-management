@@ -3,7 +3,7 @@ import { TOfferCourse } from './offeredCourse.interface';
 
 const offerCourseSchema = new Schema<TOfferCourse>(
   {
-    semesterRegister: {
+    semesterRegistration: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: 'SemesterRegistration',

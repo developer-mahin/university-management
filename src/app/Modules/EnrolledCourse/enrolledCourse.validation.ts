@@ -8,7 +8,7 @@ const createEnrolledCourseValidationZodSchema = z.object({
 
 const updateEnrolledCourseMarksValidationZodSchema = z.object({
   body: z.object({
-    semesterRegister: z.string(),
+    semesterRegistration: z.string(),
     offeredCourse: z.string(),
     student: z.string(),
     courseMarks: z.object({

@@ -10,7 +10,7 @@ export type TEnrolledCourseMarks = {
 };
 
 export type TEnrolledCourse = {
-  semesterRegister: Types.ObjectId;
+  semesterRegistration: Types.ObjectId;
   academicSemester: Types.ObjectId;
   academicFaculty: Types.ObjectId;
   academicDepartment: Types.ObjectId;

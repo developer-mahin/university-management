@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 export type Days = 'Sat' | 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri';
 
 export type TOfferCourse = {
-  semesterRegister: Types.ObjectId;
+  semesterRegistration: Types.ObjectId;
   academicSemester?: Types.ObjectId;
   academicFaculty: Types.ObjectId;
   academicDepartment: Types.ObjectId;

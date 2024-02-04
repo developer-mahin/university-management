@@ -13,7 +13,7 @@ import { handleTimeConflict } from './offeredCourse.utlis';
 
 const createOfferedCourseIntoDB = async (payload: TOfferCourse) => {
   const {
-    semesterRegister,
+    semesterRegistration,
     academicFaculty,
     academicDepartment,
     course,
@@ -38,7 +38,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferCourse) => {
    */
 
   const isSemesterRegisterExist =
-    await SemesterRegistration.findById(semesterRegister);
+    await SemesterRegistration.findById(semesterRegistration);
   if (!isSemesterRegisterExist) {
     throw new AppError(
       httpStatus.NOT_FOUND,
@@ -84,7 +84,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferCourse) => {
 
   const isSameOfferCourseWithSameRegistrationAndSameCourseIsAlreadyExist =
     await OfferedCourse.findOne({
-      semesterRegister,
+      semesterRegistration,
       course,
       section,
     });
@@ -103,7 +103,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferCourse) => {
   };
 
   const existingSchedule = await OfferedCourse.find({
-    semesterRegister,
+    semesterRegistration,
     faculty,
     days: { $in: days },
   }).select('days startTime endTime');
@@ -128,7 +128,7 @@ const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {
 
   const result = await offeredCourseQuery.queryModel;
   const meta = await offeredCourseQuery.countTotal();
-  
+
   return {
     meta,
     result,
@@ -174,7 +174,7 @@ const getMyOfferedCourseFromDB = async (
   const aggregateQuery = [
     {
       $match: {
-        semesterRegister: currentOngoingSemester._id,
+        semesterRegistration: currentOngoingSemester._id,
         academicFaculty: student.academicFaculty,
         academicDepartment: student.academicDepartment,
       },
@@ -206,7 +206,7 @@ const getMyOfferedCourseFromDB = async (
               $expr: {
                 $and: [
                   {
-                    $eq: ['$semesterRegister', '$$currentOngoingSemester'],
+                    $eq: ['$semesterRegistration', '$$currentOngoingSemester'],
                   },
                   {
                     $eq: ['$student', '$$currentStudent'],
@@ -354,10 +354,10 @@ const updateOfferedCourseInToDB = async (
     endTime,
   };
 
-  const semesterRegister = isExistOfferedCourse.semesterRegister;
+  const semesterRegistration = isExistOfferedCourse.semesterRegistration;
 
   const semesterRegistrationStatus =
-    await SemesterRegistration.findById(semesterRegister);
+    await SemesterRegistration.findById(semesterRegistration);
 
   if (semesterRegistrationStatus?.status !== 'UPCOMING') {
     throw new AppError(
@@ -367,7 +367,7 @@ const updateOfferedCourseInToDB = async (
   }
 
   const existingSchedule = await OfferedCourse.find({
-    semesterRegister,
+    semesterRegistration,
     faculty,
     days: { $in: days },
   }).select('days startTime endTime');
@@ -398,10 +398,10 @@ const deleteOfferedCourseFromDB = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Offered Course not found');
   }
 
-  const semesterRegister = isOfferedCourseExists.semesterRegister;
+  const semesterRegistration = isOfferedCourseExists.semesterRegistration;
 
   const semesterRegistrationStatus =
-    await SemesterRegistration.findById(semesterRegister).select('status');
+    await SemesterRegistration.findById(semesterRegistration).select('status');
 
   if (semesterRegistrationStatus?.status !== 'UPCOMING') {
     throw new AppError(

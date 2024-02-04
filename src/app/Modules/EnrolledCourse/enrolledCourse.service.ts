@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
+import QueryBuilder from '../../QueryBuilder/QueryBuilder';
 import AppError from '../../utils/AppError';
 import { Course } from '../Course/course.model';
 import Faculty from '../Faculty/faculty.model';
@@ -28,7 +29,7 @@ const enrolledCourse = async (userId: string, payload: TEnrolledCourse) => {
   }
 
   const isUserAlreadyEnrolled = await EnrolledCourse.findOne({
-    semesterRegister: isOfferedCourseExist.semesterRegister,
+    semesterRegistration: isOfferedCourseExist.semesterRegistration,
     offeredCourse,
     student: student._id,
   });
@@ -40,13 +41,13 @@ const enrolledCourse = async (userId: string, payload: TEnrolledCourse) => {
   const currentCredit = course?.credit;
 
   const maxCredit = await SemesterRegistration.findById(
-    isOfferedCourseExist.semesterRegister,
+    isOfferedCourseExist.semesterRegistration,
   ).select('maxCredit');
 
   const totalCreditInEnrollCourse = await EnrolledCourse.aggregate([
     {
       $match: {
-        semesterRegister: isOfferedCourseExist?.semesterRegister,
+        semesterRegistration: isOfferedCourseExist?.semesterRegistration,
         student: student._id,
       },
     },
@@ -97,7 +98,7 @@ const enrolledCourse = async (userId: string, payload: TEnrolledCourse) => {
     session.startTransaction();
 
     const {
-      semesterRegister,
+      semesterRegistration,
       academicDepartment,
       academicSemester,
       academicFaculty,
@@ -108,7 +109,7 @@ const enrolledCourse = async (userId: string, payload: TEnrolledCourse) => {
     const result = await EnrolledCourse.create(
       [
         {
-          semesterRegister,
+          semesterRegistration,
           academicSemester,
           academicFaculty,
           academicDepartment,
@@ -142,14 +143,44 @@ const enrolledCourse = async (userId: string, payload: TEnrolledCourse) => {
   }
 };
 
+const getMyEnrolledCoursesFromDB = async (
+  studentId: string,
+  query: Record<string, unknown>,
+) => {
+  const student = await Student.findOne({ id: studentId });
+
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student not found !');
+  }
+
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCourse.find({ student: student._id }).populate(
+      'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty',
+    ),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await enrolledCourseQuery.queryModel;
+  const meta = await enrolledCourseQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
 const updateEnrolledCourseMarks = async (
   facultyId: string,
   payload: Partial<TEnrolledCourse>,
 ) => {
-  const { semesterRegister, offeredCourse, student, courseMarks } = payload;
+  const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
 
   const isSemesterRegisterExist =
-    await SemesterRegistration.findById(semesterRegister);
+    await SemesterRegistration.findById(semesterRegistration);
   if (!isSemesterRegisterExist) {
     throw new AppError(
       httpStatus.NOT_FOUND,
@@ -179,7 +210,7 @@ const updateEnrolledCourseMarks = async (
   }
 
   const isCourseBelongsToFaculty = await EnrolledCourse.findOne({
-    semesterRegister,
+    semesterRegistration,
     offeredCourse,
     student,
     faculty: faculty._id,
@@ -228,4 +259,5 @@ const updateEnrolledCourseMarks = async (
 export const enrolledCourseServices = {
   enrolledCourse,
   updateEnrolledCourseMarks,
+  getMyEnrolledCoursesFromDB,
 };
