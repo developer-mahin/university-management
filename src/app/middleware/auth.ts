@@ -22,6 +22,7 @@ export const auth = (...requestedRole: TUserRole[]) => {
     ) as JwtPayload;
 
     const { role, userId, iat } = decoded;
+
     if (requestedRole && !requestedRole.includes(role)) {
       throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized');
     }

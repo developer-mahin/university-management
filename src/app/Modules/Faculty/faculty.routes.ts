@@ -12,17 +12,20 @@ router.get(
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   facultyController.getAllFaculties,
 );
+
 router.get(
   '/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
   facultyController.getSingleFaculty,
 );
+
 router.patch(
   '/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(facultySchemaValidation.updateFacultySchema),
   facultyController.updateFaculty,
 );
+
 router.delete(
   '/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
